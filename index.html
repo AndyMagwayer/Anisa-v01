@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Anisa personal AI assistant workspace">
+    <link rel="stylesheet" href="style.css">
+    <title>Anisa | Personal AI Assistant</title>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="Workspace navigation">
+            <a class="brand" href="index.html" aria-label="Anisa home">
+                <span class="brand-mark">A</span><span>Anisa</span>
+            </a>
+
+            <button class="new-chat" type="button" id="new-chat"><span aria-hidden="true">+</span> New conversation</button>
+            <nav class="nav-list" aria-label="Conversations">
+                <span class="nav-label">Today</span>
+                <a class="nav-link is-active" href="#conversation" aria-current="page">
+                    <span class="nav-icon" aria-hidden="true">~</span>New conversation
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="utility-link" type="button"><span aria-hidden="true">?</span> Help</button>
+                <button class="utility-link" type="button"><span aria-hidden="true">*</span> Settings</button>
+                <div class="profile-card"><span class="avatar">A</span><span><strong>Abdulaziz</strong><small>Personal workspace</small></span></div>
+            </div>
+        </aside>
+
+        <main class="main-content" id="conversation">
+            <header class="topbar">
+                <div class="conversation-name"><span class="status-dot"></span><span>New conversation</span></div>
+                <button class="top-action" type="button" aria-label="More conversation options">...</button>
+            </header>
+
+            <section class="assistant-space" aria-labelledby="welcome-title">
+                <div class="welcome-block" id="welcome-block">
+                    <div class="assistant-orbit" aria-hidden="true"><span>A</span></div>
+                    <p class="eyebrow">Your personal assistant</p>
+                    <h1 id="welcome-title">Good morning, Abdulaziz.</h1>
+                    <p class="welcome-copy">I am Anisa. Bring me a question, an idea, or something you want to make sense of.</p>
+                    <div class="prompt-suggestions" aria-label="Suggested prompts">
+                        <button type="button" data-prompt="Help me plan my day">Plan my day</button>
+                        <button type="button" data-prompt="Help me think through an idea">Think through an idea</button>
+                        <button type="button" data-prompt="Help me start a coding project">Start a project</button>
+                    </div>
+                </section>
+                <div class="message-list" id="message-list" aria-live="polite"></div>
+            </section>
+
+            <form class="composer-wrap" id="composer-form">
+                <label class="sr-only" for="message-input">Message Anisa</label>
+                <textarea id="message-input" rows="1" placeholder="Message Anisa..." required></textarea>
+                <div class="composer-controls"><span>Enter to send</span><button class="send-button" type="submit" aria-label="Send message">↑</button></div>
+            </form>
+            <p class="disclaimer">Anisa v0.1 is a local foundation. Conversations are not connected to an AI service yet.</p>
+        </main>
+
+        <aside class="context-panel" aria-label="Assistant context">
+            <div class="context-heading"><span>Context</span><button type="button" aria-label="Close context panel">x</button></div>
+            <div class="context-empty"><span class="context-icon" aria-hidden="true">+</span><h2>Your workspace</h2><p>As you work with Anisa, useful context and active projects will appear here.</p></div>
+            <div class="context-footer"><span class="status-dot"></span><span>Anisa is ready</span></div>
+        </aside>
+    </div>
+    <script src="script.js" defer></script>
+</body>
+</html>
