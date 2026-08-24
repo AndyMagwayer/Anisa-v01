@@ -71,8 +71,10 @@ async function sendMessage(text) {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Request failed');
         typingMessage.remove();
-        addMessage(data.reply, 'assistant');
-        conversationMessages.push({ role: 'user', content: cleanText }, { role: 'assistant', content: data.reply });
+        const assistantMessage = data.message?.content;
+        if (typeof assistantMessage !== 'string' || !assistantMessage.trim()) throw new Error('Empty assistant response');
+        addMessage(assistantMessage, 'assistant');
+        conversationMessages.push({ role: 'user', content: cleanText }, { role: 'assistant', content: assistantMessage });
         setRespondingState(false);
         input.focus();
     } catch (error) {

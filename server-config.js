@@ -17,9 +17,10 @@ loadDotEnv();
 
 const serverConfig = Object.freeze({
     port: Number(process.env.PORT) || 3000,
-    providerUrl: process.env.AI_API_URL || '',
-    providerKey: process.env.AI_API_KEY || '',
-    model: process.env.AI_MODEL || ''
+    provider: (process.env.AI_PROVIDER || 'mock').toLowerCase(),
+    providerUrl: 'https://api.openai.com/v1/chat/completions',
+    providerKey: process.env.OPENAI_API_KEY || '',
+    model: process.env.OPENAI_MODEL || 'gpt-4o-mini'
 });
 
 export { projectRoot, serverConfig };

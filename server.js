@@ -6,6 +6,7 @@ import { generateReply } from './ai-service.js';
 import { projectRoot, serverConfig } from './server-config.js';
 
 const contentTypes = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript' };
+const allowedRoles = new Set(['user', 'assistant']);
 
 function sendJson(response, status, body) {
     response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -39,11 +40,18 @@ async function handleChat(request, response) {
             sendJson(response, 400, { error: 'Message must be between 1 and 10,000 characters.' });
             return;
         }
+        if (messages.length > 50 || messages.some((message) =>
+            !message || !allowedRoles.has(message.role) || typeof message.content !== 'string' || !message.content.trim() || message.content.length > 10_000
+        )) {
+            sendJson(response, 400, { error: 'Conversation history is invalid.' });
+            return;
+        }
         const reply = await generateReply({ messages, userMessage, config: serverConfig });
-        sendJson(response, 200, { reply, assistant: anisaAssistant.identity.name });
+        sendJson(response, 200, { message: { role: 'assistant', content: reply }, assistant: anisaAssistant.identity.name });
     } catch (error) {
         console.error('Chat request failed:', error.message);
-        sendJson(response, 500, { error: 'Anisa could not respond right now. Please try again.' });
+        const status = error.message.includes('authentication') ? 502 : error.message.includes('rate limit') ? 429 : 502;
+        sendJson(response, status, { error: 'Anisa could not respond right now. Please try again.' });
     }
 }
 
