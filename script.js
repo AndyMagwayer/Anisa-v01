@@ -1,3 +1,5 @@
+import { resetMockAssistant } from './mock-assistant.js';
+
 const form = document.querySelector('#composer-form');
 const input = document.querySelector('#message-input');
 const sendButton = document.querySelector('.send-button');
@@ -6,14 +8,8 @@ const welcome = document.querySelector('#welcome-block');
 const newChatButton = document.querySelector('#new-chat');
 const assistantSpace = document.querySelector('.assistant-space');
 
-const mockResponses = [
-    'I am here and ready to help. Tell me a little more about what you want to accomplish.',
-    'That sounds like a useful direction. We can break it into a clear next step together.',
-    'I have noted that. This local response is a placeholder for the assistant connection we will add later.'
-];
-
-let responseIndex = 0;
 let isResponding = false;
+const conversationMessages = [];
 
 function scrollToLatest() {
     assistantSpace.scrollTo({ top: assistantSpace.scrollHeight, behavior: 'smooth' });
@@ -55,13 +51,7 @@ function setRespondingState(responding) {
     document.querySelector('.conversation-name span:last-child').textContent = responding ? 'Anisa is thinking...' : 'New conversation';
 }
 
-function getMockResponse() {
-    const response = mockResponses[responseIndex % mockResponses.length];
-    responseIndex += 1;
-    return response;
-}
-
-function sendMessage(text) {
+async function sendMessage(text) {
     const cleanText = text.trim();
     if (!cleanText || isResponding) return;
 
@@ -72,12 +62,25 @@ function sendMessage(text) {
     setRespondingState(true);
     const typingMessage = addTypingMessage();
 
-    window.setTimeout(() => {
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: cleanText, messages: conversationMessages })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Request failed');
         typingMessage.remove();
-        addMessage(getMockResponse(), 'assistant');
+        addMessage(data.reply, 'assistant');
+        conversationMessages.push({ role: 'user', content: cleanText }, { role: 'assistant', content: data.reply });
         setRespondingState(false);
         input.focus();
-    }, 850);
+    } catch (error) {
+        typingMessage.remove();
+        addMessage(error.message === 'Failed to fetch' ? 'I cannot reach my local backend right now. Please start the server and try again.' : 'I could not complete that request. Please try again.', 'assistant');
+        setRespondingState(false);
+        input.focus();
+    }
 }
 
 form.addEventListener('submit', (event) => {
@@ -104,7 +107,8 @@ document.querySelectorAll('[data-prompt]').forEach((button) => {
 newChatButton.addEventListener('click', () => {
     messages.replaceChildren();
     welcome.hidden = false;
-    responseIndex = 0;
+    conversationMessages.length = 0;
+    resetMockAssistant();
     setRespondingState(false);
     input.value = '';
     input.style.height = 'auto';
